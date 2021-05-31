@@ -1,32 +1,48 @@
 import uvicorn
+from PIL import Image
+from io import BytesIO
+from starlette.responses import HTMLResponse
 from fastapi import FastAPI, File, UploadFile
-from digit_prediction import predict, read_imagefile
-from starlette.responses import RedirectResponse
-
-app = FastAPI()
+from util_digits import convert_image_to_array
+from tensorflow.keras.models import load_model
 
 
-@app.get('/ping')
+app = FastAPI(title="Digit image recognition model")
+
+
+def read_image_file(file) -> Image.Image:
+    image = Image.open(BytesIO(file))
+    return image
+
+
+@app.get("/ping")
+def ping():
+    return "pong"
+
+
+@app.post("/predict_upload_file/")
+async def digit_image(file: UploadFile = File(...)):
+    model = load_model("test_model.h5")
+    image_array = convert_image_to_array(file.file, 28, 28, 1)
+    predictions = int(model.predict_classes(image_array))
+    return predictions
+
+
+@app.get("/")
 async def index():
-    return {"ping": "pong your head"}
+    content = """
+<body>
+<navbar colour="blue">A digit recognizer model</navbar>
+<form action="/predict_upload_file/" enctype="multipart/form-data" method="post">
+<input name="file" type="file" multiple>
+<input type="submit">
+</form>
+<footer>by @wizardcalidad</footer>
+</body>
+    """
 
-@app.get('/index')
-async def image_upload_test():
-    return "ready for image upload"
+    return HTMLResponse(content=content)
 
-@app.post("/predict/image")
-async def index():
-    return RedirectResponse(url="/docs")
 
-@app.post("/predict/image")
-async def predict_api(file: UploadFile = File(...)):
-    extension = file.filename.split(".")[-1] in ("jpg", "jpeg", "png")
-    if not extension:
-        return "Image must be jpg or png format!"
-    image = read_imagefile(await file.read())
-    prediction = predict(image)
-    
-    return prediction   
-    
 if __name__ == "__main__":
     uvicorn.run(app, debug=True)
