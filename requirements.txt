@@ -128,3 +128,6 @@ uvloop==0.14.0
 
 Werkzeug==2.0.1
 
+wrapt==1.12.1
+wsproto==1.0.0
+xkit==0.0.0
