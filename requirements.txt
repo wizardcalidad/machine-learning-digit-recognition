@@ -2,7 +2,7 @@ fastapi
 numpy
 scikit-learn
 uvicorn
-tensorflow
+tensorflow-cpu
 uvloop
 Keras
 httplib2
