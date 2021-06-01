@@ -22,7 +22,7 @@ def ping():
 
 @app.post("/predict_upload_file/")
 async def digit_image(file: UploadFile = File(...)):
-    model = load_model("test_model.h5")
+    model = load_model("digit_reconizer.h5")
     image_array = convert_image_to_array(file.file, 28, 28, 1)
     predictions = int(model.predict_classes(image_array))
     return predictions
