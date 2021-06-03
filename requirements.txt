@@ -4,8 +4,9 @@ scikit-learn
 uvicorn
 tensorflow-cpu
 uvloop
-Keras
 httplib2
 httptools
 gunicorn
 python-multipart
+starlette==0.14.2
+Pillow==8.2.0
